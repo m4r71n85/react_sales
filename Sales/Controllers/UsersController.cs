@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sales.Data;
@@ -22,34 +19,35 @@ namespace Sales.Controllers
             _context = context;
         }
 
-        // GET: api/Users
-        [HttpGet("{pageSize}/{page}/{sortBy}/{sortType}")]
-        public async Task<ActionResult<UsersGridViewModel>> GetUsers(int pageSize, int page, string sortBy, string sortType)
+        // GET: api/users/list
+        [HttpGet("list")]
+        public async Task<ActionResult<UsersGridViewModel>> GetUsers(int pageSize, int page, string sortField=null, string sortOrder=null)
         {
-            var usersVm = new UsersGridViewModel();
             //todo: move to repo
-            usersVm.TotalSize = await _context.Users.CountAsync();
-            var usersQuery = _context.Users.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(sortBy))
+            var usersVm = new UsersGridViewModel
             {
-                if (sortBy == "firstName")
-                    if (sortType == "asc")
-                        usersQuery = usersQuery.OrderBy(u => u.FirstName);
-                    else
-                        usersQuery = usersQuery.OrderByDescending(u => u.FirstName);
+                TotalSize = await _context.Users.CountAsync()
+            };
+            var usersQuery = _context.Users.AsQueryable();
 
-                if (sortBy == "surname")
-                    if (sortType == "asc")
-                        usersQuery = usersQuery.OrderBy(u => u.Surname);
-                    else
-                        usersQuery = usersQuery.OrderByDescending(u => u.Surname);
+            if (sortField == "firstName")
+                if (sortOrder == "asc")
+                    usersQuery = usersQuery.OrderBy(u => u.FirstName);
+                else
+                    usersQuery = usersQuery.OrderByDescending(u => u.FirstName);
+            else if (sortField == "surname")
+                if (sortOrder == "asc")
+                    usersQuery = usersQuery.OrderBy(u => u.Surname);
+                else
+                    usersQuery = usersQuery.OrderByDescending(u => u.Surname);
+            else if (sortField == "email")
+                if (sortOrder == "asc")
+                    usersQuery = usersQuery.OrderBy(u => u.Email);
+                else
+                    usersQuery = usersQuery.OrderByDescending(u => u.Email);
+            else
+                usersQuery = usersQuery.OrderBy(u => u.FirstName);
 
-                if (sortBy == "email")
-                    if (sortType == "asc")
-                        usersQuery = usersQuery.OrderBy(u => u.Email);
-                    else
-                        usersQuery = usersQuery.OrderByDescending(u => u.Email);
-            }
             usersVm.UsersData = await usersQuery.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return usersVm;
@@ -67,6 +65,16 @@ namespace Sales.Controllers
             }
 
             return user;
+        }
+
+
+        // POST: api/Users/reset
+        [HttpPost("/api/reset")]
+        public async Task<ActionResult> ResetData()
+        {
+            await _context.Database.ExecuteSqlCommandAsync("exec ResetData_SP");
+
+            return Ok();
         }
     }
 }

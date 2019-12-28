@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import axios from 'axios';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 
@@ -9,6 +10,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 
 
 export class Home extends Component {
+    pageSize = 10;
     static columns = [{
         dataField: 'firstName',
         text: 'First Name',
@@ -25,29 +27,39 @@ export class Home extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { users: [], loading: true, page: 1, sizePerPage: 10 };
+        this.state = { users: [], loading: true, page: 1, sizePerPage: this.pageSize };
         this.products = [];
-        this.handleTableChange(null, {page: 1, sizePerPage: 10});
+        this.handleTableChange(null, { page: 1, sizePerPage: this.pageSize});
     }
 
-
     handleTableChange = (type, { page, sizePerPage, filters, sortField, sortOrder }) => {
-        console.log(type, page, sizePerPage, filters, sortField, sortOrder)
-        fetch('api/Users/' + sizePerPage +'/' + page + '/' + sortField + '/' + sortOrder)
-            .then(response => response.json())
-            .then(data => {
+        this.loadUsers(page, sortField, sortOrder)
+    }
+
+    loadUsers = (page, sortField, sortOrder) => {
+        axios.get('api/users/list', {
+            params: {
+                pageSize: this.pageSize,
+                page,
+                sortField,
+                sortOrder
+            }
+        })
+            .then(response => {
                 this.setState({
                     page,
-                    users: data.usersData,
-                    totalSize: data.totalSize,
+                    users: response.data.usersData,
+                    totalSize: response.data.totalSize,
                     loading: false
                 });
             });
-    }
-    
+    }    
 
-    resetUsersData() {
-        console.log('resetting..');
+    resetUsersData = () => {
+        axios.post('api/reset')
+            .then((resp) => {
+                this.loadUsers(1)
+            });
     }
 
     static renderUsersData(users, page, sizePerPage,  totalSize, onTableChange) {
