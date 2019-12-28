@@ -30,7 +30,7 @@ export class Home extends Component {
         sort: false,
             formatter: (cell, row, rowIndex) => {
             return (
-                <Button variant="outline-info" size="sm" onClick={() => this.compareUser(cell)}>Compare</Button>
+                <Button variant="outline-info" size="sm" onClick={() => this.getCompareUser(cell)}>Compare</Button>
             );
         },
         headerAttrs: { width: 120 },
@@ -82,15 +82,15 @@ export class Home extends Component {
         super(props);
 
         this.state = {
-            users: [], loading: true, page: 1, sizePerPage: this.pageSize, compareUser: {} };
-        this.loadUsers(1);
+            users: [], loading: true, page: 1, sizePerPage: this.pageSize, compareUser: {}, topUsers: [] };
+        this.getGridUsers(1);
     }
 
     handleTableChange = (type, { page, sizePerPage, filters, sortField, sortOrder }) => {
-        this.loadUsers(page, sortField, sortOrder)
+        this.getGridUsers(page, sortField, sortOrder)
     }
 
-    loadUsers = (page, sortField, sortOrder) => {
+    getGridUsers = (page=1, sortField, sortOrder) => {
         axios.get('api/users/list', {
             params: {
                 pageSize: this.pageSize,
@@ -109,20 +109,26 @@ export class Home extends Component {
         });
     }
 
-    compareUser = (userId) => {
-        console.log(userId)
-        axios.get('api/users/sales', { params: { userId } })
+    getCompareUser = (userId) => {
+        axios.get('api/users/compare', { params: { userId } })
             .then((response) => {
                 this.setState({ compareUser: response.data })
-                console.log(response)
+            });
+    }
+
+    getTopUsers = () => {
+        axios.get('api/users/top')
+            .then((response) => {
+                this.setState({ topUsers: response.data })
             });
     }
 
     resetUsersData = () => {
         axios.post('api/reset')
             .then(() => {
-                    this.loadUsers(1);
-                });
+                this.getGridUsers();
+                this.setState({ compareUser: {} });
+            });
     }
 
     static renderUsersData(users, page, sizePerPage, totalSize, onTableChange, columns) {
@@ -143,7 +149,7 @@ export class Home extends Component {
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="uv" fill="#686dff" />
-                <ReferenceLine y={compareUser.totalVolume} label={compareUser.firstName + ' ' + compareUser.surname } stroke="red" strokeDasharray="3 3" />
+                <ReferenceLine y={compareUser.totalVolume} label={compareUser.firstName + ' ' + compareUser.surname + ' ('+ compareUser.totalVolume +')'} stroke="red" strokeDasharray="3 3" />
             </BarChart>
         );
     }

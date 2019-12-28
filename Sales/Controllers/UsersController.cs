@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,9 +54,9 @@ namespace Sales.Controllers
             return usersVm;
         }
 
-        // GET: api/users/sales/5
-        [HttpGet("sales")]
-        public async Task<ActionResult<CompareUserVm>> GetUser(int userId)
+        // GET: api/users/compare
+        [HttpGet("compare")]
+        public async Task<ActionResult<CompareUserVm>> GetUserCompareData(int userId)
         {
             var user = await _context.Users
                 .Include(u => u.Sales)
@@ -76,6 +77,19 @@ namespace Sales.Controllers
             return user;
         }
 
+        // GET: api/users/top
+        [HttpGet("top")]
+        public async Task<ActionResult<List<TopUserVm>>> GetUser()
+        {
+            var topUser = await _context.TopUserVms.FromSql(@"SELECT TOP 10 u.UserId, u.FirstName, u.Surname, SUM(s.Volume) TotalVolume
+                                                    FROM Users as u
+                                                    LEFT JOIN Sales as s ON u.UserId = s.UserId
+                                                    GROUP BY u.UserId, u.FirstName, u.Surname
+                                                    ORDER BY SUM(s.Volume) DESC")
+                                                    .ToListAsync();
+
+            return topUser;
+        }
 
         // POST: api/Users/reset
         [HttpPost("/api/reset")]

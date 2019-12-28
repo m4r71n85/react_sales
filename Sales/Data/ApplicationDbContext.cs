@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sales.Models;
+using Sales.ViewModels;
 
 namespace Sales.Data
 {
@@ -12,5 +13,6 @@ namespace Sales.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Sale> Sales { get; set; }
+        public DbQuery<TopUserVm> TopUserVms { get; set; }
     }
 }
