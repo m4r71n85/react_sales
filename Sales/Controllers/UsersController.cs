@@ -53,12 +53,21 @@ namespace Sales.Controllers
             return usersVm;
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        // GET: api/users/sales/5
+        [HttpGet("sales")]
+        public async Task<ActionResult<CompareUserVm>> GetUser(int userId)
         {
-            var user = await _context.Users.FindAsync(id);
-
+            var user = await _context.Users
+                .Include(u => u.Sales)
+                .Select(u => new CompareUserVm
+                {
+                    UserId = u.UserId,
+                    FirstName = u.FirstName,
+                    Surname = u.Surname,
+                    TotalVolume = u.Sales.Sum(s => s.Volume)
+                })
+                .FirstOrDefaultAsync(u => u.UserId == userId);
+                
             if (user == null)
             {
                 return NotFound();

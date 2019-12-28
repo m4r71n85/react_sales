@@ -14,29 +14,26 @@ export class Home extends Component {
         dataField: 'firstName',
         text: 'First Name',
         sort: true,
-        attrs: { width: 50, className: "EditRow" }
+        headerAttrs: { width: 130 },
     }, {
         dataField: 'surname',
         text: 'Surname',
         sort: true,
-        attrs: { width: 50, className: "EditRow" }
+        headerAttrs: { width: 130 },
     }, {
         dataField: 'email',
         text: 'Email',
         sort: true,
-        attrs: { width: 50, className: "EditRow" }
     }, {
         dataField: "userId",
         text: "Actions",
         sort: false,
             formatter: (cell, row, rowIndex) => {
-                console.log(cell);
             return (
-                <Button variant="warning" onClick={this.resetUsersData}>Compare</Button>
+                <Button variant="outline-info" size="sm" onClick={() => this.compareUser(cell)}>Compare</Button>
             );
         },
-        headerAttrs: { width: 50 },
-        attrs: { width: 50, className: "EditRow" }
+        headerAttrs: { width: 120 },
     }];
     data = [
             {
@@ -84,7 +81,8 @@ export class Home extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { users: [], loading: true, page: 1, sizePerPage: this.pageSize };
+        this.state = {
+            users: [], loading: true, page: 1, sizePerPage: this.pageSize, compareUser: {} };
         this.loadUsers(1);
     }
 
@@ -109,6 +107,15 @@ export class Home extends Component {
                 loading: false
             });
         });
+    }
+
+    compareUser = (userId) => {
+        console.log(userId)
+        axios.get('api/users/sales', { params: { userId } })
+            .then((response) => {
+                this.setState({ compareUser: response.data })
+                console.log(response)
+            });
     }
 
     resetUsersData = () => {
@@ -136,7 +143,7 @@ export class Home extends Component {
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="uv" fill="#686dff" />
-                <ReferenceLine y={4000} label="adfdf" stroke="red" strokeDasharray="3 3" />
+                <ReferenceLine y={compareUser.totalVolume} label={compareUser.firstName + ' ' + compareUser.surname } stroke="red" strokeDasharray="3 3" />
             </BarChart>
         );
     }
@@ -145,7 +152,7 @@ export class Home extends Component {
         let usersTableContent = Home.renderUsersData(this.state.users, this.state.page, this.state.sizePerPage, this.state.totalSize,
             this.handleTableChange, this.columns);
 
-        let topUserSales = Home.renderTopUsersChart(this.data)
+        let topUserSales = Home.renderTopUsersChart(this.data, this.state.compareUser)
 
     return (
         <div className="mt-5">

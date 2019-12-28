@@ -32,7 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="ViewModels\CompareUserVm.cs" />
     <None Include="Data\ApplicationDbContext2.cs" />
+    <None Include="ViewModels\UsersGridViewModel.cs" />
+    <None Include="ViewModels\UserViewModel.cs" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
