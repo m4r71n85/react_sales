@@ -51,7 +51,7 @@ export class Home extends Component {
         console.log('resetting..');
     }
 
-    static renderUsersData(users, page, sizePerPage, onTableChange, totalSize) {
+    static renderUsersData(users, page, sizePerPage,  totalSize, onTableChange) {
         return (
             <BootstrapTable remote keyField='userId' data={users} columns={this.columns}
                 pagination={paginationFactory({ page, sizePerPage, totalSize })}
