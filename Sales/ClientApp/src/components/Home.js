@@ -134,7 +134,7 @@ export class Home extends Component {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="totalVolume" fill="#686dff" />
+                <Bar dataKey="totalVolume" fill="#686dff" name="Sales" />
                 <ReferenceLine y={compareUser.totalVolume} label={compareUser.firstName + ' ' + compareUser.surname + ' ('+ compareUser.totalVolume +')'} stroke="red" strokeDasharray="3 3" />
             </BarChart>
         );
@@ -149,15 +149,17 @@ export class Home extends Component {
         return (
 
             <div className="mt-5">
-
-
-                <h1>Sales data</h1>
-
+                <div className="row">
+                    <div className="col mt-3 mb-4">
+                        <h1>Sales Data</h1>
+                    </div>
+                </div>
                 <div className="row mb-2">
                     <div className="col">
                         <Button variant="warning" onClick={this.resetUsersData}>Reset Data</Button>
                     </div>
                 </div>
+
                 <div className="row">
                     <div className="col-6">
                         {usersTableContent}
