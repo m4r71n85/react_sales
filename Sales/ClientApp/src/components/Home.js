@@ -165,7 +165,6 @@ export class Home extends Component {
     return (
         <div className="mt-5">
                 <h1>Sales data</h1>
-                <p>This is an interview project for Client Savvy developed by Martin Tsekov.</p>
 
                 <div className="row mb-2">
                     <div className="col">
