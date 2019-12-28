@@ -4,7 +4,6 @@ using Sales.ViewModels;
 
 namespace Sales.Data
 {
-    //todo: extract to interface
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
