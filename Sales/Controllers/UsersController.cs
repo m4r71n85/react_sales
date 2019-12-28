@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Sales.Data;
 using Sales.ViewModels;
 
@@ -11,10 +13,12 @@ namespace Sales.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepo userRepo;
+        private readonly ILogger<UsersController> logger;
 
-        public UsersController(IUserRepo userRepo)
+        public UsersController(IUserRepo userRepo, ILogger<UsersController> logger)
         {
             this.userRepo = userRepo;
+            this.logger = logger;
         }
 
         // GET: api/users/list
@@ -31,8 +35,9 @@ namespace Sales.Controllers
 
                 return usersVm;
             }
-            catch
+            catch(Exception ex)
             {
+                logger.LogError(ex, null);
                 return BadRequest("An error has occured.");
             }
         }
@@ -47,13 +52,15 @@ namespace Sales.Controllers
 
                 if (user == null)
                 {
+                    logger.LogWarning("User with UserId: {userId} not found", userId);
                     return NotFound();
                 }
 
                 return user;
             }
-            catch
+            catch (Exception ex)
             {
+                logger.LogError(ex, null);
                 return BadRequest("An error has occured.");
             }
         }
@@ -66,8 +73,9 @@ namespace Sales.Controllers
             {
                 return await userRepo.GetTopUsersAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                logger.LogError(ex, null);
                 return BadRequest("An error has occured.");
             }
         }
@@ -83,8 +91,9 @@ namespace Sales.Controllers
                 await userRepo.ResetDataAsync();
                 return Ok();
             }
-            catch
+            catch (Exception ex)
             {
+                logger.LogError(ex, null);
                 return BadRequest("An error has occured.");
             }
         }
