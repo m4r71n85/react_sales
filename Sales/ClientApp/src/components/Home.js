@@ -6,6 +6,8 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import { BarChart, Bar, ReferenceLine, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 import './Home.css';
 
 export class Home extends Component {
@@ -39,11 +41,17 @@ export class Home extends Component {
     constructor(props) {
         super(props);
 
+        toastr.options = {
+            positionClass: 'toast-top-full-width',
+            hideDuration: 300,
+            timeOut: 2000
+        }
         this.state = {
             users: [], loading: true, page: 1, sizePerPage: this.pageSize, compareUser: {}, topUsers: [] };
         this.getGridUsers();
         this.getTopUsers();
     }
+
 
     handleTableChange = (type, { page, sortField, sortOrder }) => {
         this.getGridUsers(page, sortField, sortOrder)
@@ -65,6 +73,10 @@ export class Home extends Component {
                 totalSize: response.data.totalSize,
                 loading: false
             });
+        })
+        .catch((error) => {
+            toastr.clear();
+            toastr.error(error.response.data);
         });
     }
 
@@ -72,6 +84,10 @@ export class Home extends Component {
         axios.get('api/users/compare', { params: { userId } })
             .then((response) => {
                 this.setState({ compareUser: response.data })
+            })
+            .catch((error) => {
+                toastr.clear();
+                toastr.error(error.response.data);
             });
     }
 
@@ -79,6 +95,10 @@ export class Home extends Component {
         axios.get('api/users/top')
             .then((response) => {
                 this.setState({ topUsers: response.data })
+            })
+            .catch((error) => {
+                toastr.clear();
+                toastr.error(error.response.data);
             });
     }
 
@@ -88,6 +108,12 @@ export class Home extends Component {
                 this.getGridUsers();
                 this.getTopUsers();
                 this.setState({ compareUser: {} });
+                toastr.clear();
+                toastr.success("New data seeded successfully.");
+            })
+            .catch((error) => {
+                toastr.clear();
+                toastr.error(error.response.data);
             });
     }
 
@@ -120,8 +146,11 @@ export class Home extends Component {
 
         let topUserSales = Home.renderTopUsersChart(this.state.topUsers, this.state.compareUser)
 
-    return (
-        <div className="mt-5">
+        return (
+
+            <div className="mt-5">
+
+
                 <h1>Sales data</h1>
 
                 <div className="row mb-2">
