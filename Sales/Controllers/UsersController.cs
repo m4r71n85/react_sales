@@ -81,7 +81,7 @@ namespace Sales.Controllers
         [HttpGet("top")]
         public async Task<ActionResult<List<TopUserVm>>> GetUser()
         {
-            var topUser = await _context.TopUserVms.FromSql(@"SELECT TOP 10 u.UserId, u.FirstName, u.Surname, SUM(s.Volume) TotalVolume
+            var topUser = await _context.TopUserVms.FromSql(@"SELECT TOP 10 u.UserId, u.FirstName + ' ' + u.Surname as FullName, SUM(s.Volume) TotalVolume
                                                     FROM Users as u
                                                     LEFT JOIN Sales as s ON u.UserId = s.UserId
                                                     GROUP BY u.UserId, u.FirstName, u.Surname

@@ -83,7 +83,8 @@ export class Home extends Component {
 
         this.state = {
             users: [], loading: true, page: 1, sizePerPage: this.pageSize, compareUser: {}, topUsers: [] };
-        this.getGridUsers(1);
+        this.getGridUsers();
+        this.getTopUsers();
     }
 
     handleTableChange = (type, { page, sizePerPage, filters, sortField, sortOrder }) => {
@@ -127,6 +128,7 @@ export class Home extends Component {
         axios.post('api/reset')
             .then(() => {
                 this.getGridUsers();
+                this.getTopUsers();
                 this.setState({ compareUser: {} });
             });
     }
@@ -140,15 +142,15 @@ export class Home extends Component {
         )
     }
 
-    static renderTopUsersChart(data, compareUser) {
+    static renderTopUsersChart(topUsers, compareUser) {
         return (
-            <BarChart width={640} height={250} data={data}>
+            <BarChart width={640} height={250} data={topUsers}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="fullName" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="uv" fill="#686dff" />
+                <Bar dataKey="totalVolume" fill="#686dff" />
                 <ReferenceLine y={compareUser.totalVolume} label={compareUser.firstName + ' ' + compareUser.surname + ' ('+ compareUser.totalVolume +')'} stroke="red" strokeDasharray="3 3" />
             </BarChart>
         );
@@ -158,7 +160,7 @@ export class Home extends Component {
         let usersTableContent = Home.renderUsersData(this.state.users, this.state.page, this.state.sizePerPage, this.state.totalSize,
             this.handleTableChange, this.columns);
 
-        let topUserSales = Home.renderTopUsersChart(this.data, this.state.compareUser)
+        let topUserSales = Home.renderTopUsersChart(this.state.topUsers, this.state.compareUser)
 
     return (
         <div className="mt-5">
