@@ -95,7 +95,7 @@ export class Home extends Component {
         return (
             <BootstrapTable remote keyField='userId' data={users} columns={columns}
                 pagination={paginationFactory({ page, sizePerPage, totalSize, hideSizePerPage: true })}
-                noDataIndication={"Loading..."}
+                noDataIndication={"No data..."}
                 onTableChange={onTableChange} />
         )
     }
