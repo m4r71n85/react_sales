@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sales.Data;
 using Sales.Models;
+using Sales.ViewModels;
 
 namespace Sales.Controllers
 {
@@ -22,10 +23,14 @@ namespace Sales.Controllers
         }
 
         // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpGet("{sizePerPage}/{page}")]
+        public async Task<ActionResult<UsersGridViewModel>> GetUsers(int sizePerPage, int page)
         {
-            return await _context.Users.ToListAsync();
+            var usersVm = new UsersGridViewModel();
+            usersVm.TotalSize = await _context.Users.CountAsync();
+            usersVm.UsersData = await _context.Users.Skip((page - 1) * sizePerPage).Take(sizePerPage).ToListAsync();
+
+            return usersVm;
         }
 
         // GET: api/Users/5
