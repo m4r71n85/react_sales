@@ -23,12 +23,34 @@ namespace Sales.Controllers
         }
 
         // GET: api/Users
-        [HttpGet("{sizePerPage}/{page}")]
-        public async Task<ActionResult<UsersGridViewModel>> GetUsers(int sizePerPage, int page)
+        [HttpGet("{pageSize}/{page}/{sortBy}/{sortType}")]
+        public async Task<ActionResult<UsersGridViewModel>> GetUsers(int pageSize, int page, string sortBy, string sortType)
         {
             var usersVm = new UsersGridViewModel();
+            //todo: move to repo
             usersVm.TotalSize = await _context.Users.CountAsync();
-            usersVm.UsersData = await _context.Users.Skip((page - 1) * sizePerPage).Take(sizePerPage).ToListAsync();
+            var usersQuery = _context.Users.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                if (sortBy == "firstName")
+                    if (sortType == "asc")
+                        usersQuery = usersQuery.OrderBy(u => u.FirstName);
+                    else
+                        usersQuery = usersQuery.OrderByDescending(u => u.FirstName);
+
+                if (sortBy == "surname")
+                    if (sortType == "asc")
+                        usersQuery = usersQuery.OrderBy(u => u.Surname);
+                    else
+                        usersQuery = usersQuery.OrderByDescending(u => u.Surname);
+
+                if (sortBy == "email")
+                    if (sortType == "asc")
+                        usersQuery = usersQuery.OrderBy(u => u.Email);
+                    else
+                        usersQuery = usersQuery.OrderByDescending(u => u.Email);
+            }
+            usersVm.UsersData = await usersQuery.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return usersVm;
         }
@@ -45,67 +67,6 @@ namespace Sales.Controllers
             }
 
             return user;
-        }
-
-        // PUT: api/Users/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            if (id != user.UserId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Users
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
-        }
-
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<User>> DeleteUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return user;
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.UserId == id);
         }
     }
 }

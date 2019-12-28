@@ -11,7 +11,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 export class Home extends Component {
     static columns = [{
         dataField: 'firstName',
-        text: 'FirstName',
+        text: 'First Name',
         sort: true
     }, {
         dataField: 'surname',
@@ -31,15 +31,14 @@ export class Home extends Component {
     }
 
 
-    handleTableChange = (type, { page, sizePerPage }) => {
-        fetch('api/Users/' + sizePerPage + '/' + page)
+    handleTableChange = (type, { page, sizePerPage, filters, sortField, sortOrder }) => {
+        console.log(type, page, sizePerPage, filters, sortField, sortOrder)
+        fetch('api/Users/' + sizePerPage +'/' + page + '/' + sortField + '/' + sortOrder)
             .then(response => response.json())
             .then(data => {
-                console.log(data)
                 this.setState({
                     page,
                     users: data.usersData,
-                    sizePerPage,
                     totalSize: data.totalSize,
                     loading: false
                 });
@@ -54,19 +53,28 @@ export class Home extends Component {
     static renderUsersData(users, page, sizePerPage,  totalSize, onTableChange) {
         return (
             <BootstrapTable remote keyField='userId' data={users} columns={this.columns}
-                pagination={paginationFactory({ page, sizePerPage, totalSize })}
+                pagination={paginationFactory({ page, sizePerPage, totalSize, hideSizePerPage: true })}
+                noDataIndication={"Loading..."}
                 onTableChange={onTableChange} />
         )
     }
 
+
+
     render() {
-        let usersTableContent = this.state.loading
-            ? <p><em>Loading...</em></p>
-            : Home.renderUsersData(this.state.users, this.state.page, this.state.sizePerPage, this.state.totalSize,
+        let usersTableContent = Home.renderUsersData(this.state.users, this.state.page, this.state.sizePerPage, this.state.totalSize,
             this.handleTableChange);
 
     return (
             <div className="mt-5">
+
+            <div className="spinner">
+                <div className="rect1" />
+                <div className="rect2" />
+                <div className="rect3" />
+                <div className="rect4" />
+                <div className="rect5" />
+            </div>
 
                 <h1>Sales data</h1>
                 <p>This is an interview project for Client Savvy developed by Martin Tsekov.</p>
@@ -77,7 +85,7 @@ export class Home extends Component {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col">
+                    <div className="col-7">
                         {usersTableContent}
                     </div>
                     <div className="col">
