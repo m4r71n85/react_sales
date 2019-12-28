@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Sales.Data;
 using Sales.ViewModels;
 
@@ -20,36 +19,57 @@ namespace Sales.Controllers
 
         // GET: api/users/list
         [HttpGet("list")]
-        public async Task<UsersGridViewModel> GetUsers(int pageSize, int page, string sortField = null, string sortOrder = null)
+        public async Task<ActionResult<UsersGridViewModel>> GetUsers(int pageSize, int page, string sortField = null, string sortOrder = null)
         {
-            var usersVm = new UsersGridViewModel
+            try
             {
-                TotalSize = await userRepo.GetAllUsersCountAsync(),
-                UsersData = await userRepo.GetFilteredUsersAsync(pageSize, page, sortField, sortOrder)
-            };
+                var usersVm = new UsersGridViewModel
+                {
+                    TotalSize = await userRepo.GetAllUsersCountAsync(),
+                    UsersData = await userRepo.GetFilteredUsersAsync(pageSize, page, sortField, sortOrder)
+                };
 
-            return usersVm;
+                return usersVm;
+            }
+            catch
+            {
+                return BadRequest("An error has occured.");
+            }
         }
 
         // GET: api/users/compare
         [HttpGet("compare")]
         public async Task<ActionResult<CompareUserVm>> GetUserCompareData(int userId)
         {
-            var user = await userRepo.GetUserCompareAsync(userId);
-
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                var user = await userRepo.GetUserCompareAsync(userId);
 
-            return user;
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                return user;
+            }
+            catch
+            {
+                return BadRequest("An error has occured.");
+            }
         }
 
         // GET: api/users/top
         [HttpGet("top")]
         public async Task<ActionResult<List<TopUserVm>>> GetUser()
         {
-            return await userRepo.GetTopUsersAsync();
+            try
+            {
+                return await userRepo.GetTopUsersAsync();
+            }
+            catch
+            {
+                return BadRequest("An error has occured.");
+            }
         }
 
 
@@ -57,8 +77,16 @@ namespace Sales.Controllers
         [HttpPost("/api/reset")]
         public async Task<ActionResult> ResetData()
         {
-            await userRepo.ResetDataAsync();
-            return Ok();
+
+            try
+            {
+                await userRepo.ResetDataAsync();
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest("An error has occured.");
+            }
         }
     }
 }
