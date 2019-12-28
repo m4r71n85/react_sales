@@ -28,55 +28,13 @@ export class Home extends Component {
         dataField: "userId",
         text: "Actions",
         sort: false,
-            formatter: (cell, row, rowIndex) => {
+            formatter: (cell) => {
             return (
                 <Button variant="outline-info" size="sm" onClick={() => this.getCompareUser(cell)}>Compare</Button>
             );
         },
         headerAttrs: { width: 120 },
-    }];
-    data = [
-            {
-                "name": "Page A",
-                "uv": 4000,
-            },
-            {
-                "name": "Page B",
-                "uv": 3000,
-            },
-            {
-                "name": "Page C",
-                "uv": 2000,
-            },
-            {
-                "name": "Page D",
-                "uv": 2780,
-            },
-            {
-                "name": "Page E",
-                "uv": 1890,
-            },
-            {
-                "name": "Page F",
-                "uv": 2390,
-            },
-            {
-                "name": "Page G",
-                "uv": 3490,
-            },
-            {
-                "name": "Page H",
-                "uv": 3490,
-            },
-            {
-                "name": "Page I",
-                "uv": 3490,
-            },
-            {
-                "name": "Page J",
-                "uv": 3490,
-            }
-        ];
+        }];
 
     constructor(props) {
         super(props);
@@ -87,7 +45,7 @@ export class Home extends Component {
         this.getTopUsers();
     }
 
-    handleTableChange = (type, { page, sizePerPage, filters, sortField, sortOrder }) => {
+    handleTableChange = (type, { page, sortField, sortOrder }) => {
         this.getGridUsers(page, sortField, sortOrder)
     }
 
