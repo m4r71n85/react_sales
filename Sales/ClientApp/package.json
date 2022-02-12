@@ -20,7 +20,7 @@
     "toastr": "^2.1.4"
   },
   "devDependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.3",
     "babel-eslint": "^7.2.3",
     "cross-env": "^5.2.1",
     "eslint": "^4.1.1",
